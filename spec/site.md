@@ -112,7 +112,7 @@ Execution path: a browser request hits the React app (static files from `fronten
 
 `scripts/refresh_data.py`
 - `elexon_urls(publish_from: datetime, publish_to: datetime, settlement_from: date, settlement_to: date) -> tuple[str, str]` returns (WINDFOR url, FUELHH url): `https://data.elexon.co.uk/bmrs/api/v1/datasets/WINDFOR/stream?publishDateTimeFrom=...&publishDateTimeTo=...` and `https://data.elexon.co.uk/bmrs/api/v1/datasets/FUELHH/stream?settlementDateFrom=...&settlementDateTo=...&fuelType=WIND`, times formatted `YYYY-MM-DDTHH:MMZ`.
-- `main()` downloads with the standard library only (`urllib`), for publish 2026-01-01T00:00Z → 2026-02-01T00:00Z and settlement 2026-01-02 → 2026-02-01, and writes the two files with `json.dump(..., indent=0)`. Tests import `elexon_urls` only; they never call `main()`.
+- `main()` downloads with the standard library only (`urllib`), for publish 2026-01-01T00:00Z → 2026-01-31T12:00Z (covers every run up to the last 09:50 deadline on 31 Jan) and settlement 2026-01-02 → 2026-02-01, checks each response parses as a JSON list, and writes the response bytes unchanged to `WINDFOR_PATH` / `FUELHH_PATH`, so a fresh download can be compared byte for byte with the committed files. It prints the row count per file. Tests import `elexon_urls` only; they never call `main()`.
 
 ### API
 
