@@ -139,3 +139,16 @@ def test_loaded_rows_work_with_hourly_actuals():
 
     hours = hourly_actuals(load_fuelhh(FUELHH_PATH))
     assert hours[datetime(2026, 1, 15, 12, tzinfo=UTC)].actual_mw == 9_790.5
+
+
+# --- a time without a zone is refused, not silently loaded ----------------------------------
+
+
+def test_time_without_a_zone_is_rejected(tmp_path):
+    # Without "Z" the time would load zone-less and pick_day would blank every hour
+    # with no error. Fail loudly at load time instead.
+    import pytest
+
+    bad = dict(WINDFOR_LINE, publishTime="2026-01-14T07:30:00")
+    with pytest.raises(ValueError):
+        load_windfor(write(tmp_path, "wf.json", [bad]))
