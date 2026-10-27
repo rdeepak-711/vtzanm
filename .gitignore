@@ -1,0 +1,41 @@
+docs/learn/
+docs/*.pdf
+
+# Python caches and environments
+*.pyc
+.pytest_cache/
+venv/
+env/
+
+# TypeScript and Vite caches
+*.tsbuildinfo
+.vite/
+
+# Test coverage output
+coverage/
+.nyc_output/
+
+# Package manager debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Editor settings
+.vscode/
+.idea/
+
+# Dependencies and build output
+node_modules/
+frontend/dist/
+
+# Python bytecode
+__pycache__/
+
+# Deployment and environment files
+.venv/
+.vercel/
+.env*
+
+# macOS files
+.DS_Store
