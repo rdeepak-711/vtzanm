@@ -34,7 +34,7 @@ Preview pages: `/, /month, /?date=2026-01-15, /?date=2026-01-28&cutoff=09:50`
    - `n`: count.
    - `mae_mw`: mean of |eᵢ|.
    - `bias_mw`: mean of eᵢ.
-   - `too_high`: count of eᵢ > 0. `share_too_high`: too_high / n as a float.
+   - `too_high`: count of eᵢ > 0. `share_too_high`: too_high / n as a float, not rounded (the UI formats it as a percentage).
    - `p90_mw`: sort the errors ascending and take the value at 1-based rank ⌈0.9·n⌉ (nearest-rank method, no interpolation). For n = 744 this is rank 670; for n = 24 it is rank 22.
    - `max_error_mw`: the largest eᵢ. `min_error_mw`: the smallest eᵢ (most negative, or the smallest positive if none is negative).
    - All MW values are floats rounded to 1 decimal.
@@ -143,7 +143,7 @@ Execution path: a browser request hits the React app (static files from `fronten
   "summary": {"n": 744, "...": "same fields as above"},
   "hours_off_by_1000": 552,
   "partial_hours": 0,
-  "by_hour_of_day": [{"hour": 0, "n": 31, "mae_mw": 2027.8, "bias_mw": 1952.7, "too_high": 29, "share_too_high": 0.935, "p90_mw": 3937.0, "max_error_mw": 6758.0, "min_error_mw": -605.5}],
+  "by_hour_of_day": [{"hour": 0, "n": 31, "mae_mw": 2027.8, "bias_mw": 1952.7, "too_high": 29, "share_too_high": 0.9354838709677419, "p90_mw": 3937.0, "max_error_mw": 6758.0, "min_error_mw": -605.5}],
   "by_day": [{"date": "2026-01-02", "n": 24, "mae_mw": 0.0, "bias_mw": 0.0, "too_high": 0, "share_too_high": 0.0, "p90_mw": 0.0, "max_error_mw": 0.0, "min_error_mw": 0.0, "runs_used": ["..."]}]
 }
 ```
