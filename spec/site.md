@@ -163,6 +163,8 @@ Exports and exact text (the frontend tests check these): `src/App.tsx` default-e
 
 Both charts have a side axis with MW tick labels (e.g. "5,000", "10,000", grouped en-GB) and an axis title containing "MW", and scale to their container (an SVG `viewBox`, width 100% or unset, no fixed pixel width), so they fit a 390 px phone without sideways scrolling.
 
+In the Day chart a missing forecast or actual leaves a gap in that line (the line is split into segments, elements keep the classes `line-forecast` / `line-actual`); it is never drawn as 0.
+
 Loading and error states: while fetching show "Loading…"; on an error show the message in a `role="alert"` element. No other states.
 
 Vitest + React Testing Library + jsdom, tests in `frontend/src/__tests__/` (exist, failing). `fetch` is mocked per test with fixture objects shaped like the API; no network. `package.json` must have `"test": "vitest"` and `"build": "tsc -b && vite build"` (or `vite build` alone if tsc is too slow; type errors must still be zero).
