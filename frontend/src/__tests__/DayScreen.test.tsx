@@ -165,4 +165,33 @@ describe('DayScreen', () => {
     expect(within(rows[5]).getByText(/partial/i)).toBeInTheDocument()
     expect(within(rows[6]).queryByText(/partial/i)).toBeNull()
   })
+
+  // Step 7: the browser Back button must move the screen with the address bar.
+  it('Back after Next day returns the screen to 15 Jan', async () => {
+    render(<DayScreen />)
+    await screen.findAllByTestId('hour-row')
+    fireEvent.click(screen.getByRole('button', { name: 'Next day' }))
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenLastCalledWith('/api/day?date=2026-01-16&cutoff=09:20'),
+    )
+    window.history.back()
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenLastCalledWith('/api/day?date=2026-01-15&cutoff=09:20'),
+    )
+    expect(screen.getByLabelText('Delivery date')).toHaveValue('2026-01-15')
+  })
+
+  it('Back after the 09:50 switch returns to 09:20', async () => {
+    render(<DayScreen />)
+    await screen.findAllByTestId('hour-row')
+    fireEvent.click(screen.getByRole('button', { name: '09:50 N2EX' }))
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenLastCalledWith('/api/day?date=2026-01-15&cutoff=09:50'),
+    )
+    window.history.back()
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenLastCalledWith('/api/day?date=2026-01-15&cutoff=09:20'),
+    )
+    expect(await screen.findByRole('button', { name: '09:20 EPEX' })).toHaveAttribute('aria-pressed', 'true')
+  })
 })
