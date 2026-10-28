@@ -35,6 +35,7 @@ Day screen: choose a delivery date and forecast cutoff to review the forecast, a
 ├── frontend/              Vite + React + TypeScript: Day screen and Month screen
 ├── api/index.py           Vercel entry point, imports the FastAPI app
 ├── scripts/refresh_data.py  downloads January 2026 from Elexon into data/
+├── scripts/hindsight_gap.py compares the decision-time forecast with the latest-before-delivery one
 ├── data/                  the saved WINDFOR and FUELHH responses, unchanged
 ├── tests/                 pytest suite (frontend tests live in frontend/src/__tests__)
 ├── spec/site.md           build spec: rules, expected numbers, architecture
