@@ -4,10 +4,6 @@ A web app for a UK electricity supplier's day-ahead buying team. The team buys p
 
 Data: Elexon [FUELHH](https://bmrs.elexon.co.uk/api-documentation/endpoint/datasets/FUELHH/stream) (actual national wind generation, fuelType WIND) and [WINDFOR](https://bmrs.elexon.co.uk/api-documentation/endpoint/datasets/WINDFOR/stream) (national wind forecasts). No other data.
 
-## Status
-
-Work in progress. The spec, the decisions and the January data are in the repo; the build follows the spec bottom up (logic, then API, then UI), with tests written before the code.
-
 ## How it works
 
 1. **Decision time.** A day-ahead buyer decides on the morning before delivery. The default cutoff is 09:20 UK time (EPEX GB day-ahead auction close), with 09:50 (Nord Pool N2EX) as an option. January UK time equals UTC.
@@ -17,36 +13,84 @@ Work in progress. The spec, the decisions and the January data are in the repo; 
 
 Every rule, with the alternatives considered and what it costs, is in [docs/decisions.md](docs/decisions.md).
 
+## Live app
+
+https://vtzanm.vercel.app
+
+Day screen: choose a delivery date and forecast cutoff to review the forecast, actual generation, and hourly miss.
+
+/month: review monthly performance by day and by hour of day.
+
 ## Files and directories
 
 ```text
 .
-├── spec/site.md        the build spec: rules, expected numbers, architecture, build order
-├── docs/decisions.md   decisions log (what was decided, alternatives, why, cost)
-├── findings.md         research notes: Elexon definitions, data checks, open questions
-├── data/
-│   ├── windfor_2026-01.json   WINDFOR rows published 1–31 Jan 2026
-│   └── fuelhh_2026-01.json    FUELHH wind rows for 2 Jan – 1 Feb 2026
-└── frontend/           Vite + React + TypeScript app (base template for now)
+├── backend/windapp/       Python app (FastAPI)
+│   ├── load.py            reads the saved Elexon JSON, rejects times without a zone
+│   ├── pick.py            per hour: newest forecast published at or before the cutoff
+│   ├── actuals.py         per hour: average of the two half-hour FUELHH readings
+│   ├── metrics.py         report card: average miss, lean, too-high share, 90% buffer
+│   ├── service.py         joins the above into day and month views (cached)
+│   └── main.py            HTTP routes /api/health, /api/day, /api/month + serves the built frontend
+├── frontend/              Vite + React + TypeScript: Day screen and Month screen
+├── api/index.py           Vercel entry point, imports the FastAPI app
+├── scripts/refresh_data.py  downloads January 2026 from Elexon into data/
+├── data/                  the saved WINDFOR and FUELHH responses, unchanged
+├── tests/                 pytest suite (frontend tests live in frontend/src/__tests__)
+├── spec/site.md           build spec: rules, expected numbers, architecture
+├── docs/decisions.md      decisions log: what was decided, alternatives, why, cost
+├── findings.md            research notes on the Elexon data
+├── Dockerfile             builds the frontend, then runs the app on port 8000
+├── docker-compose.yml     one service, port 8000
+└── vercel.json            Vercel build command, SPA rewrite, files bundled with the function
 ```
-
-`backend/` (Python, FastAPI), `api/` (Vercel entry), `scripts/` (data download), `tests/` and the Docker files are added during the build.
 
 ## How to start
 
-For now only the frontend shell runs:
+With Docker:
 
 ```bash
+docker compose up --build
+```
+
+Open http://localhost:8000.
+
+Without Docker, install the Python dependencies from the root requirements file and build the frontend:
+
+```bash
+pip install -r requirements.txt
 npm --prefix frontend install
+npm --prefix frontend run build
+```
+
+Then from `backend/`, start the API:
+
+```bash
+uvicorn windapp.main:app --port 8000
+```
+
+For development, run the API from `backend/` and run Vite in a second terminal; the Vite proxy forwards `/api` requests to `http://localhost:8000`:
+
+```bash
+uvicorn windapp.main:app --port 8000
 npm --prefix frontend run dev
 ```
 
-Full instructions (Docker, and the Python API without Docker) come with the build.
+Run the tests with:
 
-## Live app
+```bash
+python3 -m pytest tests -q -p no:cacheprovider
+npm --prefix frontend test -- --run
+```
 
-Link added after deployment to Vercel.
+## Data
+
+Data is downloaded once from Elexon by `python3 scripts/refresh_data.py` and saved as JSON in `data/`; restart the app after a refresh because results are cached.
+
+## Deployment
+
+Vercel builds the frontend and runs the FastAPI app as a Python function from `api/index.py`. Vercel does not run the Docker image; Docker is for running locally or on any container host.
 
 ## AI tools used
 
-Claude Code (Anthropic) for domain research, planning, the spec, tests and code review; Codex (OpenAI) for writing code. The author steers and reviews every step.
+Claude handled research, the spec, decisions, writing failing tests first, and review of every step. Codex wrote the implementation code against those tests. Deepak reviewed and traced each step.

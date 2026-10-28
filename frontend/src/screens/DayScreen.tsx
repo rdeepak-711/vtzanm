@@ -171,6 +171,18 @@ export function DayScreen() {
 
   useEffect(() => loadDay(date, cutoff, setData, setError), [date, cutoff])
 
+  // Restores the selected date and cutoff after browser navigation.
+  function handlePopState() {
+    const selected = query()
+    setDate(selected.date)
+    setCutoff(selected.cutoff)
+  }
+
+  useEffect(() => {
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
   // Updates the cutoff and keeps the address bar in sync.
   function changeCutoff(value: Cutoff) {
     setCutoff(value)
