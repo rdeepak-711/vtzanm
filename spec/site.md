@@ -108,7 +108,7 @@ Execution path: a browser request hits the React app (static files from `fronten
 - `month_view(cutoff: str = "09:20") -> dict` (the `/api/month` body)
 
 `windapp.main`
-- `app` (FastAPI). Endpoints below. After the API routes, if `frontend/dist` exists it is mounted at `/` with `StaticFiles(html=True)` so `/` and `/month` both return `index.html` (the React app does client-side routing with the pathname; no router library is needed).
+- `app` (FastAPI). Endpoints below. After the API routes, `add_frontend(app, dist: Path)` serves the built React app when `dist` exists: real files under it (e.g. `/assets/*.js`) are served as themselves, any other non-`/api` path returns `index.html` (so `/` and `/month` both load the app, which picks the screen from the pathname), and unknown `/api/*` paths stay 404. When `dist` doesn't exist it adds nothing. `main.py` calls it with `<repo>/frontend/dist`.
 
 `scripts/refresh_data.py`
 - `elexon_urls(publish_from: datetime, publish_to: datetime, settlement_from: date, settlement_to: date) -> tuple[str, str]` returns (WINDFOR url, FUELHH url): `https://data.elexon.co.uk/bmrs/api/v1/datasets/WINDFOR/stream?publishDateTimeFrom=...&publishDateTimeTo=...` and `https://data.elexon.co.uk/bmrs/api/v1/datasets/FUELHH/stream?settlementDateFrom=...&settlementDateTo=...&fuelType=WIND`, times formatted `YYYY-MM-DDTHH:MMZ`.
