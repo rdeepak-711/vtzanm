@@ -1,10 +1,63 @@
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #fbfaf7;
-  color: #1d1d1b;
+:root { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #202d2a; background: #f7f6f1; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; background: #f7f6f1; }
+button, input { font: inherit; }
+a { color: #176b61; }
+.topbar { height: 64px; padding: 0 max(22px, calc((100vw - 1120px) / 2)); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e4e3dc; background: rgba(255,255,255,.72); }
+.brand { color: #202d2a; font-size: 14px; font-weight: 700; letter-spacing: -.02em; text-decoration: none; }
+.topbar nav { display: flex; gap: 8px; }
+.topbar nav a { padding: 8px 13px; color: #52615d; font-size: 14px; font-weight: 600; text-decoration: none; border-radius: 8px; }
+.topbar nav a:hover, .topbar nav a:focus-visible { background: #e9efeb; color: #176b61; }
+main { width: min(100% - 40px, 1000px); margin: 38px auto 72px; }
+.content { display: grid; gap: 22px; }
+.screen-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; }
+.eyebrow { margin: 0 0 5px; color: #648079; font-size: 11px; font-weight: 750; letter-spacing: .13em; }
+h1 { margin: 0; color: #202d2a; font-size: clamp(28px, 5vw, 38px); line-height: 1.1; letter-spacing: -.045em; }
+h2 { margin: 8px 0 -8px; font-size: 20px; letter-spacing: -.025em; }
+.cutoff-switch { display: flex; padding: 4px; border: 1px solid #dedfd8; border-radius: 11px; background: #eeeee8; }
+.cutoff-switch button { padding: 8px 11px; border: 0; border-radius: 8px; color: #586762; background: transparent; cursor: pointer; font-size: 13px; font-weight: 650; white-space: nowrap; }
+.cutoff-switch button[aria-pressed="true"] { color: #fff; background: #176b61; box-shadow: 0 1px 3px #183d3526; }
+.date-controls { display: flex; align-items: center; gap: 8px; }
+.date-controls button { width: 40px; height: 38px; border: 1px solid #d8ddd7; border-radius: 9px; color: #176b61; background: #fff; cursor: pointer; }
+.date-controls button:disabled { color: #a9b1ad; cursor: default; }
+.date-controls input { height: 38px; padding: 0 10px; border: 1px solid #d8ddd7; border-radius: 9px; color: #25332f; background: #fff; }
+.decision { margin: -9px 0 0; color: #5f6e68; font-size: 14px; line-height: 1.55; }
+.panel { overflow: hidden; padding: 18px 18px 13px; border: 1px solid #e5e5de; border-radius: 16px; background: #fff; }
+.chart-wrap { width: 100%; overflow-x: auto; }
+.day-chart, .month-chart { display: block; width: 100%; min-width: 560px; height: auto; }
+.month-chart { min-width: 690px; }
+.gridline { stroke: #e9ece8; stroke-width: 1; }
+svg text { fill: #75817d; font: 10px system-ui, sans-serif; }
+.line-forecast, .line-actual { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.line-forecast { stroke: #176b61; }.line-actual { stroke: #d29048; stroke-dasharray: 6 5; }
+.legend { display: flex; flex-wrap: wrap; gap: 18px; padding: 3px 4px 0; color: #5c6a65; font-size: 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.key { display: inline-block; width: 18px; height: 3px; border-radius: 3px; background: #176b61; }.key.actual { background: #d29048; }.bias-key { background: #176b61; }.mae-key { width: 8px; height: 8px; border-radius: 50%; background: #d29048; }
+.summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.summary-grid article { min-width: 0; padding: 17px 16px 15px; border: 1px solid #e5e5de; border-radius: 14px; background: #fff; }
+.summary-grid strong { display: block; overflow-wrap: anywhere; color: #203b35; font-size: clamp(17px, 2.4vw, 23px); font-variant-numeric: tabular-nums; letter-spacing: -.035em; }
+.summary-grid span { display: block; margin-top: 5px; color: #53635d; font-size: 13px; font-weight: 700; }
+.summary-grid small { display: block; margin-top: 9px; color: #78847f; font-size: 11px; line-height: 1.45; }
+.table-wrap { max-width: 100%; overflow-x: auto; border: 1px solid #e2e4dd; border-radius: 13px; background: #fff; }
+table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { padding: 11px 15px; border-bottom: 1px solid #edf0eb; white-space: nowrap; }
+thead th { color: #61716b; background: #f5f7f3; font-size: 11px; font-weight: 750; letter-spacing: .04em; }
+tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+tbody th { color: #33433e; font-weight: 650; }
+tbody td { color: #53615c; }
+.positive { color: #b8503f !important; }.negative { color: #3474a2 !important; }
+.partial { color: #8a6d34; font-size: 11px; }
+.off-count { margin: -7px 0 -6px; color: #65736d; font-size: 14px; }.off-count strong { color: #293b35; }
+.bias-positive { fill: #176b61; }.bias-negative { fill: #8db8ad; }.mae-dot { fill: #d29048; stroke: #fff; stroke-width: 1.5; }
+.reading-note { padding: 16px 18px; border-left: 3px solid #176b61; border-radius: 0 10px 10px 0; background: #edf3ef; }
+.reading-note h2 { margin: 0 0 7px; font-size: 15px; }.reading-note p { margin: 0; color: #53645d; font-size: 13px; line-height: 1.6; }
+footer { padding: 18px 20px 24px; color: #82908a; text-align: center; font-size: 11px; } footer span { color: #a1aaa5; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media (max-width: 650px) {
+  .topbar { height: 58px; padding: 0 16px; }.brand { font-size: 12px; }.topbar nav a { padding: 8px 10px; }
+  main { width: calc(100% - 28px); margin: 25px auto 52px; }.content { gap: 17px; }
+  .screen-heading { align-items: start; flex-direction: column; gap: 14px; }.screen-heading .cutoff-switch { align-self: stretch; }.cutoff-switch button { flex: 1; }
+  .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }.summary-grid article { padding: 14px 12px; }.summary-grid strong { font-size: 19px; }
+  .panel { padding: 14px 11px 11px; }.decision { font-size: 13px; }
+  .table-wrap { width: 100%; } table { min-width: 570px; }
 }

@@ -4,7 +4,7 @@ from datetime import date as date_type
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from windapp import service
 
@@ -47,6 +47,28 @@ def month(cutoff: str = "09:20") -> dict:
         raise HTTPException(status_code=400, detail=str(error)) from error
 
 
+def add_frontend(app: FastAPI, dist: Path) -> None:
+    """Serve frontend files and fall back to its entry point when built."""
+    if not dist.exists():
+        return
+
+    resolved_dist = dist.resolve()
+
+    @app.get("/{path:path}")
+    def frontend(path: str):
+        if path == "api" or path.startswith("api/"):
+            raise HTTPException(status_code=404)
+
+        file_path = (dist / path).resolve()
+        try:
+            file_path.relative_to(resolved_dist)
+        except ValueError:
+            file_path = resolved_dist / "index.html"
+
+        if file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(resolved_dist / "index.html")
+
+
 frontend_dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
-if frontend_dist.exists():
-    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
+add_frontend(app, frontend_dist)
