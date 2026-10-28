@@ -147,6 +147,16 @@ describe('DayScreen', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('allowed range 2026-01-02 to 2026-02-01')
   })
 
+  it('a missing value leaves a gap in the chart line instead of dropping to zero', async () => {
+    const hours = day15.hours.map((h, i) => (i === 5 ? { ...h, forecast_mw: null, error_mw: null } : h))
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ ...day15, hours }) })))
+    const { container } = render(<DayScreen />)
+    await screen.findAllByTestId('hour-row')
+    const pts = [...container.querySelectorAll('.line-forecast')]
+      .flatMap((el) => (el.getAttribute('points') ?? '').trim().split(/\s+/).filter(Boolean))
+    expect(pts).toHaveLength(23)
+  })
+
   it('marks a partial hour', async () => {
     const hours = day15.hours.map((h, i) => (i === 5 ? { ...h, partial: true } : h))
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ ...day15, hours }) })))
