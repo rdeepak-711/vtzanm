@@ -126,6 +126,16 @@ export function MonthScreen() {
 
   useEffect(() => loadMonth(cutoff, setData, setError), [cutoff])
 
+  // Restores the selected cutoff after browser navigation.
+  function handlePopState() {
+    setCutoff(readCutoff())
+  }
+
+  useEffect(() => {
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
   if (error) {
     return (
       <section className="content">

@@ -94,3 +94,7 @@ Vercel builds the frontend and runs the FastAPI app as a Python function from `a
 ## AI tools used
 
 Claude handled research, the spec, decisions, writing failing tests first, and review of every step. Codex wrote the implementation code against those tests. Deepak reviewed and traced each step.
+
+## Time spent
+
+About 15 hours in total, under the 16-hour limit, measured from working-session activity over 26–28 Oct 2026. Roughly 5 of those went to the build itself (first commit to the deployed app, from commit timestamps); the rest went to reading the brief, checking the Elexon data, writing the spec and decisions, and reviewing each step's code.
