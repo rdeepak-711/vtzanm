@@ -94,4 +94,15 @@ describe('MonthScreen', () => {
     await screen.findByTestId('tile-mae')
     expect(screen.getByText(/forecast − actual/)).toBeInTheDocument()
   })
+
+  // The browser Back button must move the screen with the address bar.
+  it('Back after the 09:50 switch returns the month to 09:20', async () => {
+    render(<MonthScreen />)
+    await screen.findByTestId('tile-mae')
+    fireEvent.click(screen.getByRole('button', { name: '09:50 N2EX' }))
+    await waitFor(() => expect(fetchMock).toHaveBeenLastCalledWith('/api/month?cutoff=09:50'))
+    window.history.back()
+    await waitFor(() => expect(fetchMock).toHaveBeenLastCalledWith('/api/month?cutoff=09:20'))
+    expect(await screen.findByRole('button', { name: '09:20 EPEX' })).toHaveAttribute('aria-pressed', 'true')
+  })
 })
