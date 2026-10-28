@@ -39,3 +39,4 @@ __pycache__/
 
 # macOS files
 .DS_Store
+.vercel
