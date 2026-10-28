@@ -11,13 +11,29 @@ function setQuery(date: string, cutoff: Cutoff) { window.history.pushState({}, '
 function Lines({ data }: { data: DayResponse }) {
   const vals = data.hours.flatMap(h => [h.forecast_mw ?? 0, h.actual_mw ?? 0])
   const min = Math.min(...vals), max = Math.max(...vals), span = max - min || 1
-  const y = (v: number | null) => 170 - (((v ?? min) - min) / span) * 145
-  const points = (key: 'forecast_mw' | 'actual_mw') => data.hours.map((h, i) => `${24 + i * 24},${y(h[key])}`).join(' ')
-  return <div className="chart-wrap"><svg className="day-chart" viewBox="0 0 600 205" role="img" aria-label="Forecast and actual wind by hour in UTC">
-    {[0, 1, 2, 3].map(i => <line key={i} x1="24" x2="576" y1={25 + i * 48} y2={25 + i * 48} className="gridline" />)}
+  const step = niceStep(span / 4)
+  const firstTick = Math.floor(min / step) * step
+  const lastTick = Math.ceil(max / step) * step
+  const ticks = Array.from({ length: Math.max(2, Math.round((lastTick - firstTick) / step) + 1) }, (_, i) => firstTick + i * step)
+  const axisMin = ticks[0], axisMax = ticks[ticks.length - 1], axisSpan = axisMax - axisMin || 1
+  const y = (v: number | null) => 170 - (((v ?? axisMin) - axisMin) / axisSpan) * 145
+  const plotLeft = 82, plotWidth = 554
+  const points = (key: 'forecast_mw' | 'actual_mw') => data.hours.map((h, i) => `${plotLeft + i * plotWidth / Math.max(1, data.hours.length - 1)},${y(h[key])}`).join(' ')
+  return <div className="chart-wrap"><svg className="day-chart" viewBox="0 0 660 205" role="img" aria-label="Forecast and actual wind by hour in UTC">
+    {ticks.map(value => { const tickY = 170 - ((value - axisMin) / axisSpan) * 145; return <g key={value}>
+      <line x1={plotLeft} x2={plotLeft + plotWidth} y1={tickY} y2={tickY} className="gridline" />
+      <text x="72" y={tickY + 3} textAnchor="end">{Math.round(value).toLocaleString('en-GB')}</text>
+    </g> })}
+    <text x="18" y="18" className="axis-title">MW</text>
     <polyline points={points('forecast_mw')} className="line-forecast" /> <polyline points={points('actual_mw')} className="line-actual" />
-    {[0, 6, 12, 18, 23].map(h => <text key={h} x={24 + h * 24} y="198" textAnchor="middle">{String(h).padStart(2, '0')}</text>)}
+    {[0, 6, 12, 18, 23].map(h => <text key={h} x={plotLeft + h * plotWidth / 23} y="198" textAnchor="middle">{String(h).padStart(2, '0')}</text>)}
   </svg></div>
+}
+
+function niceStep(value: number) {
+  const magnitude = 10 ** Math.floor(Math.log10(Math.max(1, value)))
+  const fraction = value / magnitude
+  return (fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10) * magnitude
 }
 
 export function DayScreen() {

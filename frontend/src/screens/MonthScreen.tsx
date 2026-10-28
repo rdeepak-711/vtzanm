@@ -5,12 +5,23 @@ import { CutoffSwitch } from './CutoffSwitch'
 
 function readCutoff(): Cutoff { return new URLSearchParams(window.location.search).get('cutoff') === '09:50' ? '09:50' : '09:20' }
 function writeCutoff(c: Cutoff) { window.history.pushState({}, '', `/month?cutoff=${c}`) }
+function niceStep(value: number) {
+  const magnitude = 10 ** Math.floor(Math.log10(Math.max(1, value)))
+  const fraction = value / magnitude
+  return (fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10) * magnitude
+}
 function HourChart({ data }: { data: MonthResponse }) {
   const max = Math.max(1, ...data.by_hour_of_day.flatMap(h => [Math.abs(h.bias_mw), h.mae_mw]))
-  const base = 135, scale = 95 / max
-  return <div className="chart-wrap"><svg className="month-chart" viewBox="0 0 720 205" role="img" aria-label="Forecast lean and average miss by hour of day">
-    <line x1="24" x2="696" y1={base} y2={base} className="gridline" />
-    {data.by_hour_of_day.map(h => { const x = 30 + h.hour * 28; const height = Math.abs(h.bias_mw) * scale; return <g key={h.hour}>
+  const step = niceStep(max / 4), axisMax = Math.ceil(max / step) * step
+  const base = 135, scale = 95 / axisMax, plotLeft = 92
+  const ticks = Array.from({ length: Math.round(axisMax / step) + 1 }, (_, i) => i * step)
+  return <div className="chart-wrap"><svg className="month-chart" viewBox="0 0 780 205" role="img" aria-label="Forecast lean and average miss by hour of day">
+    {ticks.map(value => { const y = base - value * scale; return <g key={value}>
+      <line x1={plotLeft} x2="768" y1={y} y2={y} className="gridline" />
+      <text x="82" y={y + 3} textAnchor="end">{Math.round(value).toLocaleString('en-GB')}</text>
+    </g> })}
+    <text x="18" y="18" className="axis-title">MW</text>
+    {data.by_hour_of_day.map(h => { const x = plotLeft + 7 + h.hour * 28; const height = Math.abs(h.bias_mw) * scale; return <g key={h.hour}>
       <rect data-testid="hod-bar" x={x} y={h.bias_mw >= 0 ? base - height : base} width="14" height={Math.max(1, height)} rx="3" className={h.bias_mw >= 0 ? 'bias-positive' : 'bias-negative'}><title>{String(h.hour).padStart(2, '0')}:00 · lean {fmtSigned(h.bias_mw)}</title></rect>
       <circle cx={x + 7} cy={base - h.mae_mw * scale} r="3.5" className="mae-dot"><title>{String(h.hour).padStart(2, '0')}:00 · average miss {fmtMw(h.mae_mw)}</title></circle>
       {h.hour % 3 === 0 && <text x={x + 7} y="195" textAnchor="middle">{String(h.hour).padStart(2, '0')}</text>}
