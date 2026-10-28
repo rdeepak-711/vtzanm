@@ -53,6 +53,17 @@ describe('MonthScreen', () => {
     expect(await screen.findAllByTestId('hod-bar')).toHaveLength(24)
   })
 
+  it('the chart has MW numbers on its side axis and scales to its box', async () => {
+    const { container } = render(<MonthScreen />)
+    await screen.findAllByTestId('hod-bar')
+    const svg = container.querySelector('svg')!
+    const labels = [...svg.querySelectorAll('text')].map((t) => t.textContent ?? '')
+    expect(labels.some((l) => /^\d{1,2},\d{3}$/.test(l))).toBe(true)
+    expect(labels.some((l) => l.includes('MW'))).toBe(true)
+    expect(svg.getAttribute('viewBox')).toBeTruthy()
+    expect(['100%', null]).toContain(svg.getAttribute('width'))
+  })
+
   it('lists the 3 worst then the 3 best days, worst first', async () => {
     render(<MonthScreen />)
     const rows = await screen.findAllByTestId('day-row')

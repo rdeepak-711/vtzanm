@@ -78,6 +78,23 @@ describe('DayScreen', () => {
     expect(container.querySelector('svg')).not.toBeNull()
   })
 
+  it('the chart has MW numbers on its side axis', async () => {
+    const { container } = render(<DayScreen />)
+    await screen.findAllByTestId('hour-row')
+    const svg = container.querySelector('svg')!
+    const labels = [...svg.querySelectorAll('text')].map((t) => t.textContent ?? '')
+    expect(labels.some((l) => /^\d{1,2},\d{3}$/.test(l))).toBe(true)
+    expect(labels.some((l) => l.includes('MW'))).toBe(true)
+  })
+
+  it('the chart scales to its box instead of a fixed width', async () => {
+    const { container } = render(<DayScreen />)
+    await screen.findAllByTestId('hour-row')
+    const svg = container.querySelector('svg')!
+    expect(svg.getAttribute('viewBox')).toBeTruthy()
+    expect(['100%', null]).toContain(svg.getAttribute('width'))
+  })
+
   it('Next day asks for 16 Jan and updates the address', async () => {
     render(<DayScreen />)
     await screen.findAllByTestId('hour-row')
