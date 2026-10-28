@@ -38,3 +38,18 @@
 - Elexon glossary, Wind Generation Forecast: https://www.elexon.co.uk/bsc/glossary/wind-generation-forecast/
 - Elexon glossary, Half Hourly Generation by Fuel Type: https://www.elexon.co.uk/bsc/glossary/half-hourly-generation-by-fuel-type/
 - Nord Pool GB day-ahead auction (09:50 gate): https://support.nordpoolgroup.com/support/solutions/articles/8000088463-about-the-day-ahead-gb-auction
+
+## Hindsight gap (28 Oct 2026, `scripts/hindsight_gap.py`)
+
+Same 720 hours (delivery 2–31 Jan; 1 Feb excluded because saved WINDFOR runs stop at 31 Jan 12:00), each scored two ways against the same actual. "Decision time" is the app's rule; "hindsight" is the newest run published before the hour started, i.e. what a latest-forecast-vs-actual dashboard shows. 712 of 720 hindsight runs were 0.5–3.5 h before delivery; 8 hours were 4.5–11.5 h because of one missing run.
+
+| 09:20 cutoff | decision time | hindsight | gap |
+|---|---|---|---|
+| avg miss (MW) | 2,073.3 | 1,717.0 | 356.3 |
+| lean (MW) | +1,773.4 | +1,503.6 | 269.8 |
+| 90% buffer (MW) | 4,166.5 | 3,449.0 | 717.5 |
+| too high (hours) | 609 | 620 | |
+
+09:50: decision avg miss 2,051.6, lean +1,759.7, buffer 4,173.5; hindsight identical to the above.
+
+Reading: a hindsight dashboard understates the buyer's miss by about 17% (356 MW) and the cover needed by about 720 MW. The bigger finding is that even a forecast published 0.5–3.5 h before delivery is too high by +1,504 MW on average and in 620 of 720 hours. The over-forecast is not a lead-time problem; it is structural. This fits the curtailment hypothesis (WINDFOR = possible wind, FUELHH = delivered) but does not prove it; only these two datasets are allowed.
